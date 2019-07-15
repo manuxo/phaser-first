@@ -36,18 +36,20 @@ class GameScene extends Phaser.Scene {
             frameWidth: 45,
             frameHeight: 45
         });
+        this.load.spritesheet('pikachu','/img/pikachu.png',{frameWidth: 45, frameHeight: 45});
         this.load.audio('opening','/sounds/opening.mp3');
     }
     create(){
+        //Config
         gameState.active = true;
-
-        this.add.image(0,0,'background').setOrigin(0,0);
-
-        gameState.player = this.physics.add.sprite(50,50,'player');
-
-        gameState.player.setCollideWorldBounds(true);
         gameState.cursors = this.input.keyboard.createCursorKeys();
-
+        //Assets
+        gameState.openingAudio = this.sound.add('opening');
+        this.add.image(0,0,'background').setOrigin(0,0);
+        //Player
+        gameState.player = this.physics.add.sprite(50,50,'player');
+        gameState.player.setCollideWorldBounds(true);
+        
         this.anims.create({
             key: PlayerDirections.DOWN.key,
             frames: this.anims.generateFrameNumbers('player',{start:0,end:3}),
@@ -84,8 +86,25 @@ class GameScene extends Phaser.Scene {
             frameRate: 5,
             repeat: -1
         });
-
-        gameState.openingAudio = this.sound.add('opening');
+        //Pokemons
+        gameState.pokemons = this.physics.add.staticGroup();
+        gameState.pikachu = gameState.pokemons.create(150,150,'pikachu').setScale(.8);
+        gameState.pikachu.setInteractive();
+        gameState.pikachu.on('pointerover',() => {
+            gameState.pikachu.setBlendMode(Phaser.BlendModes.SCREEN);
+        });
+        gameState.pikachu.on('pointerout',() => {
+            gameState.pikachu.setBlendMode(Phaser.BlendModes.NORMAL);
+        });
+        this.anims.create({
+            key: 'pikachu-idle',
+            frames: this.anims.generateFrameNumbers('pikachu',{start:0,end:5}),
+            frameRate: 5,
+            repeat: -1
+        });
+        //Colliders and Overlaps
+        this.physics.add.collider(gameState.player,gameState.pokemons);
+        gameState.pikachu.anims.play('pikachu-idle',true);
         gameState.openingAudio.play();
     }
     update(){
