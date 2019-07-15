@@ -1,0 +1,4 @@
+pikachu,player - 45x45
+squirtle 45x42
+charmander 45x41
+bulbasaur 45x40

@@ -37,6 +37,9 @@ class GameScene extends Phaser.Scene {
             frameHeight: 45
         });
         this.load.spritesheet('pikachu','/img/pikachu.png',{frameWidth: 45, frameHeight: 45});
+        this.load.spritesheet('bulbasaur','/img/bulbasaur.png',{frameWidth: 45, frameHeight: 40});
+        this.load.spritesheet('squirtle','/img/squirtle.png',{frameWidth: 45, frameHeight: 42});
+        this.load.spritesheet('charmander','/img/charmander.png',{frameWidth: 45, frameHeight: 41});
         this.load.audio('opening','/sounds/opening.mp3');
     }
     create(){
@@ -88,23 +91,80 @@ class GameScene extends Phaser.Scene {
         });
         //Pokemons
         gameState.pokemons = this.physics.add.staticGroup();
-        gameState.pikachu = gameState.pokemons.create(150,150,'pikachu').setScale(.8);
+        gameState.pikachu = gameState.pokemons.create(50,150,'pikachu').setScale(.8);
+        gameState.bulbasaur = gameState.pokemons.create(150,350,'bulbasaur').setScale(.8);
+        gameState.squirtle = gameState.pokemons.create(350,75,'squirtle').setScale(.8);
+        gameState.charmander = gameState.pokemons.create(275,200,'charmander').setScale(.8);
         gameState.pikachu.setInteractive();
         gameState.pikachu.on('pointerover',() => {
             gameState.pikachu.setBlendMode(Phaser.BlendModes.SCREEN);
+            this.game.canvas.style.cursor = "pointer";
         });
         gameState.pikachu.on('pointerout',() => {
             gameState.pikachu.setBlendMode(Phaser.BlendModes.NORMAL);
+            this.game.canvas.style.cursor = "default";
         });
+
+        gameState.bulbasaur.setInteractive();
+        gameState.bulbasaur.on('pointerover',() => {
+            gameState.bulbasaur.setBlendMode(Phaser.BlendModes.SCREEN);
+            this.game.canvas.style.cursor = "pointer";
+        });
+        gameState.bulbasaur.on('pointerout',() => {
+            gameState.bulbasaur.setBlendMode(Phaser.BlendModes.NORMAL);
+            this.game.canvas.style.cursor = "default";
+        });
+
+        gameState.squirtle.setInteractive();
+        gameState.squirtle.on('pointerover',() => {
+            gameState.squirtle.setBlendMode(Phaser.BlendModes.SCREEN);
+            this.game.canvas.style.cursor = "pointer";
+        });
+        gameState.squirtle.on('pointerout',() => {
+            gameState.squirtle.setBlendMode(Phaser.BlendModes.NORMAL);
+            this.game.canvas.style.cursor = "default";
+        });
+
+        gameState.charmander.setInteractive();
+        gameState.charmander.on('pointerover',() => {
+            gameState.charmander.setBlendMode(Phaser.BlendModes.SCREEN);
+            this.game.canvas.style.cursor = "pointer";
+        });
+        gameState.charmander.on('pointerout',() => {
+            gameState.charmander.setBlendMode(Phaser.BlendModes.NORMAL);
+            this.game.canvas.style.cursor = "default";
+        });
+        
         this.anims.create({
             key: 'pikachu-idle',
             frames: this.anims.generateFrameNumbers('pikachu',{start:0,end:5}),
-            frameRate: 5,
+            frameRate: 4,
+            repeat: -1
+        });
+        this.anims.create({
+            key: 'bulbasaur-idle',
+            frames: this.anims.generateFrameNumbers('bulbasaur',{start:0,end:3}),
+            frameRate: 4,
+            repeat: -1
+        });
+        this.anims.create({
+            key: 'squirtle-idle',
+            frames: this.anims.generateFrameNumbers('squirtle',{start:0,end:5}),
+            frameRate: 4,
+            repeat: -1
+        });
+        this.anims.create({
+            key: 'charmander-idle',
+            frames: this.anims.generateFrameNumbers('charmander',{start:0,end:2}),
+            frameRate: 4,
             repeat: -1
         });
         //Colliders and Overlaps
         this.physics.add.collider(gameState.player,gameState.pokemons);
         gameState.pikachu.anims.play('pikachu-idle',true);
+        gameState.bulbasaur.anims.play('bulbasaur-idle',true);
+        gameState.squirtle.anims.play('squirtle-idle',true);
+        gameState.charmander.anims.play('charmander-idle',true);
         gameState.openingAudio.play();
     }
     update(){
