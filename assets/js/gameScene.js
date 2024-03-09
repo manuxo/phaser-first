@@ -2,24 +2,32 @@ const gameState = {};
 const PlayerDirections = {
     UP: { 
         id: 0, 
-        idleKey: 'player-up-idle', 
+        idleKey: 'player-up-idle',
+        biking: 'player-biking-up',
+        bikingIdle: 'player-biking-up-idle',
         key: 'player-up' 
     },
     DOWN: { 
         id: 1, 
         idleKey: 'player-down-idle', 
+        bikingIdle: 'player-biking-down-idle',
+        biking: 'player-biking-down',
         key: 'player-down' 
     },
     LEFT: { 
         id: 2, 
         idleKey: 'player-horizontal-idle', 
         key: 'player-horizontal',
+        bikingIdle: 'player-biking-horizontal-idle',
+        biking: 'player-biking-horizontal',
         flipX: true 
     },
     RIGHT: { 
         id: 3, 
         idleKey: 'player-horizontal-idle', 
         key: 'player-horizontal',
+        biking: 'player-biking-horizontal',
+        bikingIdle: 'player-biking-horizontal-idle',
         flipX: false
     }
 };
@@ -28,6 +36,8 @@ class GameScene extends Phaser.Scene {
     constructor(){
         super({ key: 'GameScene'});
         this.pressed = false;
+        this.useBike = false;
+        this.velocity = 1;
     }
 
     preload(){
@@ -46,6 +56,7 @@ class GameScene extends Phaser.Scene {
         //Config
         gameState.active = true;
         gameState.cursors = this.input.keyboard.createCursorKeys();
+        gameState.bikeKey = this.input.keyboard.addKey('B');
         //Assets
         gameState.openingAudio = this.sound.add('opening');
         this.add.image(0,0,'background').setOrigin(0,0);
@@ -89,6 +100,55 @@ class GameScene extends Phaser.Scene {
             frameRate: 5,
             repeat: -1
         });
+        this.anims.create({
+            key: PlayerDirections.DOWN.biking,
+            frames: this.anims.generateFrameNumbers('player',{start:12,end:15}),
+            frameRate:5,
+            repeat: -1
+        });
+        this.anims.create({
+            key: PlayerDirections.DOWN.bikingIdle,
+            frames: this.anims.generateFrameNumbers('player',{start:12,end:12}),
+            frameRate:5,
+            repeat: -1
+        });
+        this.anims.create({
+            key: PlayerDirections.UP.biking,
+            frames: this.anims.generateFrameNumbers('player',{start:16,end:19}),
+            frameRate: 5,
+            repeat: -1
+        });
+        this.anims.create({
+            key: PlayerDirections.UP.bikingIdle,
+            frames: this.anims.generateFrameNumbers('player',{start:16,end:16}),
+            frameRate: 5,
+            repeat: -1
+        });
+        this.anims.create({
+            key: PlayerDirections.LEFT.biking,
+            frames: this.anims.generateFrameNumbers('player',{start:20,end:23}),
+            frameRate: 5,
+            repeat: -1
+        });
+        this.anims.create({
+            key: PlayerDirections.LEFT.bikingIdle,
+            frames: this.anims.generateFrameNumbers('player',{start:20,end:20}),
+            frameRate: 5,
+            repeat: -1
+        });
+        this.anims.create({
+            key: PlayerDirections.RIGHT.biking,
+            frames: this.anims.generateFrameNumbers('player',{start:20,end:23}),
+            frameRate: 5,
+            repeat: -1
+        });
+        this.anims.create({
+            key: PlayerDirections.RIGHT.bikingIdle,
+            frames: this.anims.generateFrameNumbers('player',{start:20,end:20}),
+            frameRate: 5,
+            repeat: -1
+        });
+
         //Pokemons
         gameState.pokemons = this.physics.add.staticGroup();
         gameState.pikachu = gameState.pokemons.create(50,150,'pikachu').setScale(.8);
@@ -169,31 +229,39 @@ class GameScene extends Phaser.Scene {
     }
     update(){
         if(gameState.active){
-            if(gameState.cursors.right.isDown){
+            if (gameState.bikeKey.isDown) {
+                this.useBike = !this.useBike;
+                this.velocity = this.useBike ? 1.5 : 1;
+            } else if(gameState.cursors.right.isDown){
                 gameState.lastDirection = PlayerDirections.RIGHT;
                 gameState.player.setVelocityY(0);
-                gameState.player.setVelocityX(150);
-                gameState.player.anims.play(gameState.lastDirection.key,true);
-                gameState.player.flipX = PlayerDirections.RIGHT.flipX;
+                gameState.player.setVelocityX(150 * this.velocity);
+                const key = this.useBike ? gameState.lastDirection.biking : gameState.lastDirection.key;
+                gameState.player.anims.play(key,true);
+                gameState.player.flipX = gameState.lastDirection.flipX;
             }else if(gameState.cursors.left.isDown){
                 gameState.lastDirection = PlayerDirections.LEFT;
                 gameState.player.setVelocityY(0);
-                gameState.player.setVelocityX(-150);
-                gameState.player.anims.play(gameState.lastDirection.key,true);
-                gameState.player.flipX = PlayerDirections.LEFT.flipX;
+                gameState.player.setVelocityX(-150 * this.velocity);
+                const key = this.useBike ? gameState.lastDirection.biking : gameState.lastDirection.key;
+                gameState.player.anims.play(key,true);
+                gameState.player.flipX = gameState.lastDirection.flipX;
             }else if(gameState.cursors.down.isDown){
                 gameState.lastDirection = PlayerDirections.DOWN;
                 gameState.player.setVelocityX(0);
-                gameState.player.setVelocityY(150);
-                gameState.player.anims.play(gameState.lastDirection.key,true);
+                gameState.player.setVelocityY(150 * this.velocity);
+                const key = this.useBike ? gameState.lastDirection.biking : gameState.lastDirection.key;
+                gameState.player.anims.play(key, true);
             }else if(gameState.cursors.up.isDown){
                 gameState.lastDirection = PlayerDirections.UP;
                 gameState.player.setVelocityX(0);
-                gameState.player.setVelocityY(-150);
-                gameState.player.anims.play(gameState.lastDirection.key,true);
+                gameState.player.setVelocityY(-150 * this.velocity);
+                const key = this.useBike ? gameState.lastDirection.biking : gameState.lastDirection.key;
+                gameState.player.anims.play(key,true);
             }else{
                 if(gameState.lastDirection){
-                    gameState.player.anims.play(gameState.lastDirection.idleKey,true);
+                    const key = this.useBike ? gameState.lastDirection.bikingIdle : gameState.lastDirection.idleKey;
+                    gameState.player.anims.play(key,true);
                 }
                 gameState.player.setVelocity(0);
             }
